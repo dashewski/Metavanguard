@@ -21,6 +21,7 @@ contract NftToken is
     address public addressBook;
     uint256 public royaltyFees;
     uint256 public nextTokenId;
+    mapping(uint256 nftId => bool) public isOpened;
 
     function initialize(
         address _addressBook,
@@ -43,6 +44,15 @@ contract NftToken is
         _safeMint(_recipient, tokenId_);
     }
 
+    function open(uint256 _nftId) external {
+        require(msg.sender == ownerOf(_nftId), "only token owner!");
+        require(isOpened[_nftId] == false, "already opened");
+        isOpened[_nftId] = true;
+
+        address nftTokensObserver = IAddressBook(addressBook).nftTokensObserver();
+        INftTokensObserver(nftTokensObserver).notifyOpen(_nftId);
+    }
+
     function _afterTokenTransfer(
         address _from,
         address _to,
@@ -50,7 +60,7 @@ contract NftToken is
         uint256
     ) internal override {
         address nftTokensObserver = IAddressBook(addressBook).nftTokensObserver();
-        INftTokensObserver(nftTokensObserver).notify(_nftId, _from, _to);
+        INftTokensObserver(nftTokensObserver).notifyChangeOwner(_nftId, _from, _to);
     }
 
     function royaltyInfo(
