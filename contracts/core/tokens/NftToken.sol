@@ -19,6 +19,8 @@ contract NftToken is
     ERC721Upgradeable
 {
     address public addressBook;
+    // TODO №4
+    // Кто получает royalty? 
     uint256 public royaltyFees;
     uint256 public nextTokenId;
     mapping(uint256 nftId => bool) public isOpened;
@@ -44,6 +46,8 @@ contract NftToken is
         _safeMint(_recipient, tokenId_);
     }
 
+    // TODO №1
+    // ...
     function open(uint256 _nftId) external {
         require(msg.sender == ownerOf(_nftId), "only token owner!");
         require(isOpened[_nftId] == false, "already opened");

@@ -25,6 +25,8 @@ contract NftTokensObserver is INftTokensObserver, UUPSUpgradeable {
         emit ChangeOwner(msg.sender, _nftId, _from, _to);
     }
 
+    // TODO №1
+    // Уточнить необходимость параметра OPEN на уровне контрактов, или перенести полностью н бэк
     function notifyOpen(uint256 _nftId) external {
         IAddressBook(addressBook).enforceIsNftTokenContract(msg.sender);
         emit Open(msg.sender, _nftId);

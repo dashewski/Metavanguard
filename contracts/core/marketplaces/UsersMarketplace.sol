@@ -119,6 +119,7 @@ contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721
     function buy(uint256 _sellId) external nonReentrant {
         address _seller = seller[_sellId];
         require(_seller != address(0), "sell not exists!");
+        require(msg.sender != _seller, "cant buy from yourself!");
         require(buyer[_sellId] == address(0), "already bought!");
 
         IERC20Metadata _payToken = IERC20Metadata(payToken[_sellId]);

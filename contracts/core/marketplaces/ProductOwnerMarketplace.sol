@@ -21,6 +21,8 @@ contract ProductOwnerMarketplace is
     address public addressBook;
     address public server;
 
+    // TODO №2
+    // Уточнить определение цен
     mapping(address payToken => uint256) public defaultPrice;
     mapping(address payToken => mapping(address nftToken => uint256)) public price;
 
