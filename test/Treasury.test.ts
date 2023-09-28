@@ -9,7 +9,6 @@ const TEST_DATA = {
   tokens: [
     {
       address: USDT,
-      pricer: 'UsdtPricer',
     },
   ],
 }
@@ -40,14 +39,6 @@ describe(`Treasury`, () => {
   })
 
   for (const tokenData of TEST_DATA.tokens) {
-    it(`Initial: ${tokenData.address} pricers`, async () => {
-      const pricer = await treasury.pricers(tokenData.address)
-      const pricerAddress = ethers.utils.isAddress(tokenData.pricer)
-        ? tokenData.pricer
-        : (await deployments.get(tokenData.pricer)).address
-      assert(pricer == pricerAddress, `pricer != pricerAddress, ${pricer} != ${pricerAddress}`)
-    })
-
     it(`Regular: owner withdraw`, async () => {
       const token = IERC20__factory.connect(tokenData.address, user)
       const amount = await ERC20Minter.mint(token.address, user.address, 10000)
@@ -61,19 +52,6 @@ describe(`Treasury`, () => {
       )
     })
 
-    it(`Error: user update token`, async () => {
-      const newTokenPricer = CHAINLINK_LINK_USD
-      await expect(
-        treasury.connect(user).updateTokenPricer(tokenData.address, newTokenPricer),
-      ).to.be.revertedWith('only product owner!')
-    })
-
-    it(`Error: user delete token`, async () => {
-      await expect(treasury.connect(user).deleteToken(tokenData.address)).to.be.revertedWith(
-        'only product owner!',
-      )
-    })
-
     it(`Error: user withdraw`, async () => {
       const amount = 10
       await expect(
@@ -81,18 +59,4 @@ describe(`Treasury`, () => {
       ).to.be.revertedWith('Treasury: withdraw not authorized!')
     })
   }
-
-  it(`Error: user add token`, async () => {
-    const newToken = LINK
-    const newTokenPricer = CHAINLINK_LINK_USD
-    await expect(treasury.connect(user).addToken(newToken, newTokenPricer)).to.be.revertedWith(
-      'only product owner!',
-    )
-  })
-
-  it(`Error: user setOnlyProductOwnerWithdrawn`, async () => {
-    await expect(treasury.connect(user).setOnlyProductOwnerWithdrawn(true)).to.be.revertedWith(
-      'only product owner!',
-    )
-  })
 })
