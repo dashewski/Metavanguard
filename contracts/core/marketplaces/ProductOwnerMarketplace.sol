@@ -37,16 +37,10 @@ contract ProductOwnerMarketplace is
 
     function initialize(
         address _addressBook,
-        address _server,
-        address[] calldata _payTokens,
-        uint256[] calldata _defaultPrices
+        address _server
     ) public initializer {
-        require(_payTokens.length == _defaultPrices.length, "length!");
         addressBook = _addressBook;
         server = _server;
-        for (uint256 i; i < _payTokens.length; ++i) {
-            defaultPrice[_payTokens[i]] = _defaultPrices[i];
-        }
     }
 
     function _authorizeUpgrade(address) internal view override {

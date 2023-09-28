@@ -13,9 +13,10 @@ import { IAddressBook } from "../../interfaces/IAddressBook.sol";
 
 contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721HolderUpgradeable {
     using SafeERC20 for IERC20Metadata;
-    uint256 public nextSellId;
 
     address public addressBook;
+    
+    uint256 public nextSellId;
 
     mapping(uint256 sellId => address) public seller;
     mapping(uint256 sellId => address) public itemAddress;
