@@ -56,7 +56,7 @@ describe(`Treasury`, () => {
       const amount = 10
       await expect(
         treasury.connect(user).withdraw(tokenData.address, amount, user.address),
-      ).to.be.revertedWith('Treasury: withdraw not authorized!')
+      ).to.be.revertedWith('only product owner!')
     })
   }
 })
