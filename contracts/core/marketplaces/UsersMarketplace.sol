@@ -15,7 +15,7 @@ contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721
     using SafeERC20 for IERC20Metadata;
 
     address public addressBook;
-    
+
     uint256 public nextSellId;
 
     mapping(uint256 sellId => address) public seller;
@@ -51,28 +51,6 @@ contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721
         IAddressBook(addressBook).enforceIsProductOwner(msg.sender);
     }
 
-    function sellInfo(
-        uint256 _sellId
-    )
-        external
-        view
-        returns (
-            address seller_,
-            address itemAddress_,
-            uint256 itemId_,
-            uint256 price_,
-            address payToken_,
-            address buyer_
-        )
-    {
-        seller_ = seller[_sellId];
-        itemAddress_ = itemAddress[_sellId];
-        itemId_ = itemId[_sellId];
-        price_ = price[_sellId];
-        payToken_ = payToken[_sellId];
-        buyer_ = buyer[_sellId];
-    }
-
     function putSale(
         address _itemAddress,
         uint256 _itemId,
@@ -84,8 +62,11 @@ contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721
         _addressBook.enforceIsPayToken(_payToken);
         require(_price > 0, "price!");
 
-        uint256 sellId = nextSellId++;
         address _seller = msg.sender;
+        
+        IERC721(_itemAddress).safeTransferFrom(_seller, address(this), _itemId);
+
+        uint256 sellId = nextSellId++;
 
         seller[sellId] = _seller;
         itemAddress[sellId] = _itemAddress;
@@ -157,5 +138,27 @@ contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721
         buyer[_sellId] = _seller;
 
         emit CloseSell(_sellId);
+    }
+
+    function sellInfo(
+        uint256 _sellId
+    )
+        external
+        view
+        returns (
+            address seller_,
+            address itemAddress_,
+            uint256 itemId_,
+            uint256 price_,
+            address payToken_,
+            address buyer_
+        )
+    {
+        seller_ = seller[_sellId];
+        itemAddress_ = itemAddress[_sellId];
+        itemId_ = itemId[_sellId];
+        price_ = price[_sellId];
+        payToken_ = payToken[_sellId];
+        buyer_ = buyer[_sellId];
     }
 }

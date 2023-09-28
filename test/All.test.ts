@@ -177,7 +177,8 @@ describe(`AllTest`, () => {
             const sellId = 0
             const price = ethers.utils.parseUnits('3000', await payToken.decimals())
             await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
-            await usersMarketplace.putSale(nftToken.address, nftId, payToken.address, price)
+            await nftToken.connect(user).approve(usersMarketplace.address, nftId)
+            await usersMarketplace.connect(user).putSale(nftToken.address, nftId, payToken.address, price)
 
             await payToken.connect(user).transfer(user2.address, price)
             await payToken.connect(user2).approve(usersMarketplace.address, price)
