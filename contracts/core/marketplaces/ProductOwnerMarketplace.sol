@@ -8,6 +8,7 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 
 import { INftToken } from "../../interfaces/INftToken.sol";
 import { IAddressBook } from "../../interfaces/IAddressBook.sol";
+import { INftTokensFactory } from "../../interfaces/INftTokensFactory.sol";
 import { VerifySignedMessage } from "../../utils/VerifySignedMessage.sol";
 
 contract ProductOwnerMarketplace is
@@ -77,7 +78,9 @@ contract ProductOwnerMarketplace is
 
         IERC20Metadata(_payToken).safeTransferFrom(msg.sender, _addressBook.treasury(), _price);
 
-        uint256 nftId = INftToken(_nftToken).mint(msg.sender);
+        address nftTokensFactory = _addressBook.nftTokensFactory();
+        uint256 nftId = INftTokensFactory(nftTokensFactory).regularMint(_nftToken, msg.sender);
+
         emit Buy(msg.sender, _nftToken, nftId, _payToken, _price);
     }
 
@@ -119,7 +122,9 @@ contract ProductOwnerMarketplace is
             );
         }
 
-        uint256 nftId = INftToken(_nftToken).mint(msg.sender);
+        address nftTokensFactory = _addressBook.nftTokensFactory();
+        uint256 nftId = INftTokensFactory(nftTokensFactory).discountedMint(_nftToken, msg.sender);
+
         emit DiscountedBuy(
             msg.sender,
             _nftToken,
