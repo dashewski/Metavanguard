@@ -13,6 +13,7 @@ contract AddressBook is IAddressBook, UUPSUpgradeable {
     address public productOwner;
     address public productOwnerMarketplace;
     address public treasury;
+    address public nftTokensFactory;
     address public nftTokensObserver;
     mapping(address => bool) public nftTokens;
     mapping(address => bool) public payTokens;
@@ -41,6 +42,13 @@ contract AddressBook is IAddressBook, UUPSUpgradeable {
     function setNftToken(address _nftToken, bool _value) external {
         enforceIsProductOwner(msg.sender);
         nftTokens[_nftToken] = _value;
+    }
+
+    function setNftTokensFactory(address _nftTokensFactory) external {
+        enforceIsProductOwner(msg.sender);
+        require(nftTokensObserver == address(0), "nftTokensFactory already setted!");
+
+        nftTokensFactory = _nftTokensFactory;
     }
 
     function setNftTokensObserver(address _nftTokensObserver) external {
@@ -78,6 +86,10 @@ contract AddressBook is IAddressBook, UUPSUpgradeable {
 
     function enforceIsNftTokenContract(address _contract) external view {
         require(nftTokens[_contract], "only nft token!");
+    }
+
+    function enforceIsNftTokensFactory(address _account) external view {
+        require(nftTokensFactory == _account, "only nft token factory!");
     }
 
     function enforceIsPayToken(address _token) external view {

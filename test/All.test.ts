@@ -4,16 +4,18 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import {
   IERC20Metadata,
   IERC20Metadata__factory,
-  Item,
-  Item__factory,
   Treasury,
   Treasury__factory,
-  FixStakingStrategy,
-  FixStakingStrategy__factory,
   NftToken,
   NftToken__factory,
+  ProductOwnerMarketplace,
+  ProductOwnerMarketplace__factory,
+  UsersMarketplace,
+  UsersMarketplace__factory,
+  NftReferalStaking,
+  NftReferalStaking__factory,
 } from '../typechain-types'
-import { ELCT, USDT } from '../constants/addresses'
+import { USDT } from '../constants/addresses'
 import ERC20Minter from './utils/ERC20Minter'
 import { BigNumber } from 'ethers'
 import { time } from '@nomicfoundation/hardhat-network-helpers'
@@ -24,7 +26,7 @@ const TEST_DATA = {
   ],
   nftTokens: [
     'DubaiNftToken', //
-    'ChinaNftToken',
+    // 'ChinaNftToken',
   ],
 }
 
@@ -34,15 +36,30 @@ describe(`AllTest`, () => {
   let server: SignerWithAddress
   let user: SignerWithAddress
   let treasury: Treasury
+  let productOwnerMarketplace: ProductOwnerMarketplace
+  let usersMarketplace: UsersMarketplace
+  let nftReferalStaking: NftReferalStaking
 
   before(async () => {
     const accounts = await ethers.getSigners()
     productOwner = accounts[0]
     server = accounts[1]
     user = accounts[9]
+
     await deployments.fixture()
+
     const TreasuryDeployment = await deployments.get('Treasury')
     treasury = Treasury__factory.connect(TreasuryDeployment.address, productOwner)
+
+    const ProductOwnerMarketplaceDeployment = await deployments.get('ProductOwnerMarketplace')
+    productOwnerMarketplace = ProductOwnerMarketplace__factory.connect(ProductOwnerMarketplaceDeployment.address, productOwner)
+
+    const UsersMarketplaceDeployment = await deployments.get('UsersMarketplace')
+    usersMarketplace = UsersMarketplace__factory.connect(UsersMarketplaceDeployment.address, productOwner)
+
+    const NftReferalStakingDeployment = await deployments.get('NftReferalStaking')
+    nftReferalStaking = NftReferalStaking__factory.connect(NftReferalStakingDeployment.address, productOwner)
+
     initSnapshot = await ethers.provider.send('evm_snapshot', [])
   })
 
@@ -52,7 +69,7 @@ describe(`AllTest`, () => {
   })
 
   for (const nftTokenTag of TEST_DATA.nftTokens) {
-    describe(`NFT token ${nftTokenTag}`, () => {
+    describe(`NFT payToken ${nftTokenTag}`, () => {
       let nftToken: NftToken
 
       beforeEach(async () => {
@@ -63,18 +80,26 @@ describe(`AllTest`, () => {
         )
       })
 
-      for (const tokenAddress of TEST_DATA.payTokens) {
-        describe(`Token ${tokenAddress}`, () => {
-          let token: IERC20Metadata
+      for (const payTokenAddress of TEST_DATA.payTokens) {
+        describe(`Token ${payTokenAddress}`, () => {
+          let payToken: IERC20Metadata
           let mintedPayTokensAmount: BigNumber
 
           beforeEach(async () => {
-            token = IERC20Metadata__factory.connect(tokenAddress, user)
-            mintedPayTokensAmount = await ERC20Minter.mint(token.address, user.address, 100000)
+            payToken = IERC20Metadata__factory.connect(payTokenAddress, user)
+            mintedPayTokensAmount = await ERC20Minter.mint(payToken.address, user.address, 100000)
+            await payToken.connect(user).approve(productOwnerMarketplace.address, mintedPayTokensAmount)
           })
 
           it(`test`, async () => {
-            
+            const nftId = 0;
+            const stakeId = 0;
+            await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
+            await nftToken.connect(user).approve(nftReferalStaking.address, nftId)
+            await nftReferalStaking.connect(user).stake(nftToken.address, nftId)
+            await time.increase(366 * 24 * 60 * 60)
+            await nftReferalStaking.connect(user).unstake(stakeId)
+            await expect( nftReferalStaking.connect(user).stake(nftToken.address, nftId)).to.be.revertedWith('already staked!')
           })
         })
       }

@@ -27,7 +27,7 @@ contract NftToken is INftToken, ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC
     }
 
     function mint(address _recipient) external returns (uint256 tokenId_) {
-        IAddressBook(addressBook).enforceIsProductOwnerMarketplace(msg.sender);
+        IAddressBook(addressBook).enforceIsNftTokensFactory(msg.sender);
         tokenId_ = nextTokenId++;
         _safeMint(_recipient, tokenId_);
     }

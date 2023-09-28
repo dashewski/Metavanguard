@@ -30,5 +30,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 }
 
 deploy.tags = ['ChinaNftToken']
-deploy.dependencies = ['NftTokenImplementation', 'AddressBook']
+deploy.dependencies = ['NftTokenImplementation', 'AddressBook', 'NftTokensObserver']
 export default deploy

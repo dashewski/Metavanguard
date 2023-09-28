@@ -5,10 +5,16 @@ import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import { ERC721HolderUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 
 import { IAddressBook } from "../../interfaces/IAddressBook.sol";
 
-contract NftReferalStaking is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721Upgradeable {
+contract NftReferalStaking is
+    ReentrancyGuardUpgradeable,
+    UUPSUpgradeable,
+    ERC721Upgradeable,
+    ERC721HolderUpgradeable
+{
     address public addressBook;
     uint256 public nextStakingId;
     uint256 public lockPeriod;
@@ -38,7 +44,7 @@ contract NftReferalStaking is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC72
 
     function stake(address _nftToken, uint256 _nftId) external nonReentrant {
         IAddressBook(addressBook).enforceIsNftTokenContract(_nftToken);
-        require(alreadyStaked[_nftToken][_nftId] == false, "already staked");
+        require(alreadyStaked[_nftToken][_nftId] == false, "already staked!");
         alreadyStaked[_nftToken][_nftId] = true;
 
         address owner = msg.sender;

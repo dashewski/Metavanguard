@@ -1,5 +1,6 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
+import { AddressBook__factory } from '../typechain-types'
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { ethers, deployments } = hre
@@ -26,6 +27,9 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       },
     },
   })
+  
+  const addressBook = AddressBook__factory.connect(AddressBookDeployment.address, deployer)
+  await (await addressBook.setNftTokensObserver(deployment.address)).wait()
 }
 
 deploy.tags = ['NftTokensObserver']
