@@ -15,16 +15,17 @@ contract NftTokensFactory is ReentrancyGuardUpgradeable, UUPSUpgradeable {
 
     mapping(address account => bool) public minters;
     mapping(address nftToken => mapping(uint256 nftId => bool)) public isDiscountedMint;
+
     // mapping(address nftToken => mapping(uint256 nftId => bool)) public isCreditMint;
 
     function initialize(address _addressBook, address[] calldata _minters) public initializer {
         addressBook = _addressBook;
-        for(uint256 i; i < _minters.length; ++i) {
+        for (uint256 i; i < _minters.length; ++i) {
             minters[_minters[i]] = true;
         }
     }
 
-    function setMinter(address _minter) external  {
+    function setMinter(address _minter) external {
         IAddressBook(addressBook).enforceIsProductOwner(msg.sender);
         minters[_minter] = true;
     }
@@ -45,7 +46,10 @@ contract NftTokensFactory is ReentrancyGuardUpgradeable, UUPSUpgradeable {
         tokenId_ = INftToken(_nftToken).mint(_recipient);
     }
 
-    function discountedMint(address _nftToken, address _recipient) external returns (uint256 tokenId_) {
+    function discountedMint(
+        address _nftToken,
+        address _recipient
+    ) external returns (uint256 tokenId_) {
         _enfroceIsMinterRole();
         tokenId_ = INftToken(_nftToken).mint(_recipient);
         isDiscountedMint[_nftToken][tokenId_] = true;
