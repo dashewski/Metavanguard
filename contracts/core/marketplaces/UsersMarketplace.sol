@@ -7,10 +7,11 @@ import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils
 import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { IERC2981 } from "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import { ERC721HolderUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 
 import { IAddressBook } from "../../interfaces/IAddressBook.sol";
 
-contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable {
+contract UsersMarketplace is ReentrancyGuardUpgradeable, UUPSUpgradeable, ERC721HolderUpgradeable {
     using SafeERC20 for IERC20Metadata;
     uint256 public nextSellId;
 
