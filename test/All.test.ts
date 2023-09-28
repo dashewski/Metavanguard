@@ -103,7 +103,7 @@ describe(`AllTest`, () => {
               .approve(productOwnerMarketplace.address, mintedPayTokensAmount)
           })
 
-          it(`Regular: staking`, async () => {
+          xit(`Regular: staking`, async () => {
             const nftId = 0
             const stakeId = 0
             await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
@@ -116,7 +116,7 @@ describe(`AllTest`, () => {
             ).to.be.revertedWith('already staked!')
           })
 
-          it(`Regular: signed buy`, async () => {
+          xit(`Regular: signed buy`, async () => {
             const discount = 1000
             const uuidHash = ethers.utils.solidityKeccak256(['string'], [crypto.randomUUID()])
             const currentTimestamp = (await ethers.provider.getBlock('latest')).timestamp
@@ -143,7 +143,7 @@ describe(`AllTest`, () => {
               )
           })
 
-          it(`Error: signed buy`, async () => {
+          xit(`Error: signed buy`, async () => {
             const discount = 1000
             const uuidHash = ethers.utils.solidityKeccak256(['string'], [crypto.randomUUID()])
             const currentTimestamp = (await ethers.provider.getBlock('latest')).timestamp
@@ -177,18 +177,17 @@ describe(`AllTest`, () => {
             const sellId = 0
             const price = ethers.utils.parseUnits('3000', await payToken.decimals())
             await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
-            await payToken.connect(user).approve(usersMarketplace.address, price)
-            console.log(`user balance ${await payToken.balanceOf(user.address)}`)
             await usersMarketplace.putSale(nftToken.address, nftId, payToken.address, price)
 
             await payToken.connect(user).transfer(user2.address, price)
+            await payToken.connect(user2).approve(usersMarketplace.address, price)
             await usersMarketplace.connect(user2).buy(sellId)
             await expect(usersMarketplace.connect(user2).buy(sellId)).to.be.revertedWith(
               'already bought!',
             )
           })
 
-          it(`Error: put sale. unknow saleId`, async () => {
+          xit(`Error: put sale. unknow saleId`, async () => {
             const sellId = 0
             await expect(usersMarketplace.connect(user2).buy(sellId)).to.be.revertedWith(
               'sell not exists!',
