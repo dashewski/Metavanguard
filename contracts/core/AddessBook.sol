@@ -44,6 +44,11 @@ contract AddressBook is IAddressBook, UUPSUpgradeable {
         nftTokens[_nftToken] = _value;
     }
 
+    function setPayToken(address _payToken, bool _value) external {
+        enforceIsProductOwner(msg.sender);
+        payTokens[_payToken] = _value;
+    }
+
     function setNftTokensFactory(address _nftTokensFactory) external {
         enforceIsProductOwner(msg.sender);
         require(nftTokensObserver == address(0), "nftTokensFactory already setted!");

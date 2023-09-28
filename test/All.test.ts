@@ -103,7 +103,7 @@ describe(`AllTest`, () => {
               .approve(productOwnerMarketplace.address, mintedPayTokensAmount)
           })
 
-          xit(`Regular: staking`, async () => {
+          it(`Regular: staking`, async () => {
             const nftId = 0
             const stakeId = 0
             await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
@@ -177,8 +177,11 @@ describe(`AllTest`, () => {
             const sellId = 0
             const price = ethers.utils.parseUnits('3000', await payToken.decimals())
             await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
+            await payToken.connect(user).approve(usersMarketplace.address, price)
+            console.log(`user balance ${await payToken.balanceOf(user.address)}`)
             await usersMarketplace.putSale(nftToken.address, nftId, payToken.address, price)
 
+            await payToken.connect(user).transfer(user2.address, price)
             await usersMarketplace.connect(user2).buy(sellId)
             await expect(usersMarketplace.connect(user2).buy(sellId)).to.be.revertedWith(
               'already bought!',
