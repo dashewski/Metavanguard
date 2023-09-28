@@ -37,6 +37,7 @@ describe(`AllTest`, () => {
   let productOwner: SignerWithAddress
   let server: SignerWithAddress
   let user: SignerWithAddress
+  let user2: SignerWithAddress
   let treasury: Treasury
   let productOwnerMarketplace: ProductOwnerMarketplace
   let usersMarketplace: UsersMarketplace
@@ -47,6 +48,7 @@ describe(`AllTest`, () => {
     productOwner = accounts[0]
     server = accounts[1]
     user = accounts[9]
+    user2 = accounts[8]
 
     await deployments.fixture()
 
@@ -101,7 +103,7 @@ describe(`AllTest`, () => {
               .approve(productOwnerMarketplace.address, mintedPayTokensAmount)
           })
 
-          xit(`test`, async () => {
+          xit(`Regular: staking`, async () => {
             const nftId = 0
             const stakeId = 0
             await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
@@ -114,7 +116,7 @@ describe(`AllTest`, () => {
             ).to.be.revertedWith('already staked!')
           })
 
-          it(`signed buy`, async () => {
+          it(`Regular: signed buy`, async () => {
             const discount = 1000
             const uuidHash = ethers.utils.solidityKeccak256(['string'], [crypto.randomUUID()])
             const currentTimestamp = (await ethers.provider.getBlock('latest')).timestamp
@@ -126,7 +128,7 @@ describe(`AllTest`, () => {
               nftToken: nftToken.address,
               discount,
               uuidHash,
-              exireiesTimestamp
+              exireiesTimestamp,
             })
 
             await productOwnerMarketplace
@@ -137,12 +139,11 @@ describe(`AllTest`, () => {
                 discount,
                 uuidHash,
                 exireiesTimestamp,
-                signature
+                signature,
               )
-              console.log('aw16')
           })
-          
-          it(`error signed buy`, async () => {
+
+          it(`Error: signed buy`, async () => {
             const discount = 1000
             const uuidHash = ethers.utils.solidityKeccak256(['string'], [crypto.randomUUID()])
             const currentTimestamp = (await ethers.provider.getBlock('latest')).timestamp
@@ -154,19 +155,41 @@ describe(`AllTest`, () => {
               nftToken: nftToken.address,
               discount,
               uuidHash,
-              exireiesTimestamp
+              exireiesTimestamp,
             })
 
-            await expect(productOwnerMarketplace
-              .connect(user)
-              .discountedBuy(
-                nftToken.address,
-                payToken.address,
-                discount + 1000,
-                uuidHash,
-                exireiesTimestamp,
-                signature
-              )).to.be.revertedWith('signature!')
+            await expect(
+              productOwnerMarketplace
+                .connect(user)
+                .discountedBuy(
+                  nftToken.address,
+                  payToken.address,
+                  discount + 1000,
+                  uuidHash,
+                  exireiesTimestamp,
+                  signature,
+                ),
+            ).to.be.revertedWith('signature!')
+          })
+
+          it(`Regular: put sale`, async () => {
+            const nftId = 0
+            const sellId = 0
+            const price = ethers.utils.parseUnits('3000', await payToken.decimals())
+            await productOwnerMarketplace.connect(user).buy(nftToken.address, payToken.address)
+            await usersMarketplace.putSale(nftToken.address, nftId, payToken.address, price)
+
+            await usersMarketplace.connect(user2).buy(sellId)
+            await expect(usersMarketplace.connect(user2).buy(sellId)).to.be.revertedWith(
+              'already bought!',
+            )
+          })
+
+          it(`Error: put sale. unknow saleId`, async () => {
+            const sellId = 0
+            await expect(usersMarketplace.connect(user2).buy(sellId)).to.be.revertedWith(
+              'sell not exists!',
+            )
           })
         })
       }
