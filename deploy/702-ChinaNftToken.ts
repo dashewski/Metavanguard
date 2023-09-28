@@ -8,7 +8,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const signers = await ethers.getSigners()
   const deployer = signers[0]
-  
+
   const NftTokenImplementationDeployment = await get('NftTokenImplementation')
   const AddressBookDeployment = await get('AddressBook')
 
@@ -21,8 +21,9 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         AddressBookDeployment.address, // _addressBook
         'China Collection', // _name
         'CHINA_MVTG', // _symbol
-      ])
-    ]
+        1000, // _royaltyFees
+      ]),
+    ],
   })
 
   const addressBook = AddressBook__factory.connect(AddressBookDeployment.address, deployer)
