@@ -36,9 +36,7 @@ contract NftReferalStaking is
     function _authorizeUpgrade(address) internal view override {
         IAddressBook(addressBook).enforceIsProductOwner(msg.sender);
     }
-
-    // TODO №3
-    // Нужна ли возможность менять период блокировки в рамках контракта, если да то касается ли это уже застейканфх токенов
+    
     function setLockPeriod(uint256 _newLockPeriod) external {
         IAddressBook(addressBook).enforceIsProductOwner(msg.sender);
         lockPeriod = _newLockPeriod;

@@ -19,10 +19,9 @@ contract NftToken is
     ERC721Upgradeable
 {
     address public addressBook;
-    // TODO №4
-    // Кто получает royalty? 
     uint256 public royaltyFees;
     uint256 public nextTokenId;
+    // оставить
     mapping(uint256 nftId => bool) public isOpened;
 
     function initialize(
@@ -40,14 +39,14 @@ contract NftToken is
         IAddressBook(addressBook).enforceIsProductOwner(msg.sender);
     }
 
+    // add royalty setter
+
     function mint(address _recipient) external returns (uint256 tokenId_) {
         IAddressBook(addressBook).enforceIsNftTokensFactory(msg.sender);
         tokenId_ = nextTokenId++;
         _safeMint(_recipient, tokenId_);
     }
 
-    // TODO №1
-    // ...
     function open(uint256 _nftId) external {
         require(msg.sender == ownerOf(_nftId), "only token owner!");
         require(isOpened[_nftId] == false, "already opened");
