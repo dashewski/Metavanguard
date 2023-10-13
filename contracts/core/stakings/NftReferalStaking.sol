@@ -8,6 +8,7 @@ import { ERC721Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC
 import { ERC721HolderUpgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 
 import { IAddressBook } from "../../interfaces/IAddressBook.sol";
+import { INftToken } from "../../interfaces/INftToken.sol";
 
 contract NftReferalStaking is
     ReentrancyGuardUpgradeable,
@@ -44,6 +45,7 @@ contract NftReferalStaking is
 
     function stake(address _nftToken, uint256 _nftId) external nonReentrant {
         IAddressBook(addressBook).enforceIsNftTokenContract(_nftToken);
+        INftToken(_nftToken).enforceIsNotOpen(_nftId);
         require(alreadyStaked[_nftToken][_nftId] == false, "already staked!");
         alreadyStaked[_nftToken][_nftId] = true;
 
