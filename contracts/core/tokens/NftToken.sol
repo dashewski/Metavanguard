@@ -56,6 +56,14 @@ contract NftToken is
         INftTokensObserver(nftTokensObserver).notifyOpen(_nftId);
     }
 
+    function enforceIsOpen(uint256 _nftId) external view {
+        require(isOpened[_nftId], "only open nft!");
+    }
+
+    function enforceIsNotOpen(uint256 _nftId) external view {
+        require(isOpened[_nftId] == false, "only chest nft!");
+    }
+
     function _afterTokenTransfer(
         address _from,
         address _to,
